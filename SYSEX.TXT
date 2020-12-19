@@ -1,0 +1,246 @@
+FM Midi Synth driver Version 2.0
+Copyright (c) 1993 by Jamie O'Connell
+
+System Exclusive Information
+
+The FM Synth driver is a bi-directional driver: it provides
+a MIDI input port in order to implement System Exclusive
+dumps.  The driver can send or receive System Exclusive data
+and recieve commands.  The general format of a SysEx message
+is as follows:
+
+     F0      	MIDI Sys Ex
+     00,00, 5B  Manufacturers' ID: WinJammer Software Ltd.
+     7F      	Device ID -- Must be present
+     01      	Model ID -- FM Synth Driver
+     xx      	Command ID -- See Below
+     aa      	Address MSB -- Location: Bank#,
+                Percussion or System
+     aa      	Address LSB -- Timbre# or Parameter
+     ss      	Size MSB of following Data Block or
+             	#Bytes to dump
+     ss      	Size LSB
+     data    	Data if send request, otherwise blank
+     F7      	End of Exclusive Command
+
+Command ID
+
+     Code     Meaning
+     (Hex)
+     11       Request Data from Driver
+     12       Send Data to the Driver, Send Data
+              to the Application
+     15       Reset Driver to Power-on state
+     16       Reset Timbre Banks
+     
+In order to receive system exclusive dumps from the driver,
+the FM Synth SysEx Input driver must be attached to an
+application input port.  It is then a simple matter of
+sending the desired starting address, and a size describing
+the amount of data to dump.  The data received from the
+driver contains a command id of 12 hex, so that the data is in
+the proper format to be shipped back to the driver at any
+time.
+
+The Reset Timbre Bank message and the Reset Driver message
+contain only a single Command ID code -- no address or size
+bytes.
+
+Address Bytes
+
+The address bytes, together determine where data will be
+stored.  See below for specific locations.
+
+Size Bytes
+
+The total size of the data block is determined by combining
+the size bytes (7 bits of each).  Data is stored or dumped
+consecutively in Address order -- this means that you can
+fill or dump the entire contents of the driver with one data
+block.
+
+Timbre Banks
+
+Individual timbres or entire banks may be uploaded to the
+driver.  The new timbre parameters remain until the driver is
+reset.  You can send the sysex block as if the Banks and
+timbres were stored consecutively.  Individual parameters
+can be written to by placing a value in the address offset
+(LSB).  The new timbre will not take effect until a program
+change is made to access the timbre.
+
+Address Map
+
+Addr     Addr     Description
+MSB      LSB
+00       00       Bank 0, Timbre 0 -- this refers to the
+                  first timbre in the first bank -- each
+                  timbre is 24 bytes long (see below for
+                  format)
+00       01       This refers to the second timbre in the
+                  first bank
+...      ...      ... The rest of the bank
+00       7F       The last timbre in the first bank
+01       00       The first timbre in the second bank
+...      ...      ... The remaining timbres
+04       7F       The last timbre in the fifth bank
+                  
+                  Percussion Parameters
+10       00       First Percussion timbre
+10       2E       Last Percussion timbre (0-46)
+11       00       Percussion Map -- Size: 94 bytes (See
+                  Below)
+                  *Version 2.0 Percussion Bank*
+12       00       First Percussion timbre  
+12       7F       Last Percussion timbre 
+               
+                  System Parameters
+20       00       Location of the System Parameters --
+                  Size: 36 Bytes 
+22       00       Location of the System Parameters --
+                  Size: 37 Bytes (See Below)
+
+   
+Timbre Exclusive Format
+
+Offset  Description              Allowed Values
+
+00    Modulator Attack Rate    0 - 15 higher is faster
+01    Modulator Decay Rate     0-15
+02    Modulator Sustain Rate   0-15
+03    Modulator Release Rate   0-15
+04    Modulator                4 lower bits indicating on
+      Trem,Vib,EnvScale,KSR    or off:
+                               |...|AM|VIB|EGT|KSR|
+05    Modulator Frequency      0-15 (0 = 1/2)
+      Multiplier
+06    Modulator KSL            KSL: 0-3
+07    Modulator Output Level   0-63 zero is loudest
+      (attenuation)
+08    Modulator Wave Form      Wave: 0-7 (0-3 on OPL2)
+09    Modulator Feedback, Op   |...|F|F|F|C| - FB: 0-7,
+      Connection               FM: 0, Add Syn: 1
+10    Carrier Attack Rate      0 - 15 higher is faster
+11    Carrier Decay Rate       0-15
+12    Carrier Sustain Rate     0-15
+13    Carrier Release Rate     0-15
+14    Carrier                  4 lower bits indicating on
+      Trem,Vib,EnvScale,KSR    or off:
+                               |...|AM|VIB|EGT|KSR|
+15    Carrier Frequency        0-15 (0 = 1/2)
+      Multiplier
+16    Carrier KSL              KSL: 0-3
+17    Carrier Output Level     0-63 zero is loudest
+      (attenuation)
+18    Carrier Wave Form        Wave: 0-7 (0-3 on OPL2)
+19    Percussion Voice#        Used for Percussion
+                               patches: 6=BD, 7=SD,
+                               8=TT, 9=CYM, 10=HH
+20    Transposition Offset     |...|S|TTTTTT| S=0 pos,1
+                               neg;Trans: 0-63
+21    Percussion Pitch         *New for Version 2.0*
+22    Reserved                 Set to 0 -- Future Use
+23    Reserved                 Set to 0 -- Future Use
+
+Each timbre is 24 bytes long.  Each bank holds 128 timbres.
+There are 3,072 bytes in an entire Bank message (plus
+header).  All five banks can be filled by one 15,360 byte
+message (plus header).
+
+Percussion Timbres
+
+Version 2.0 of the FM Synth driver adds percussion bank 
+loading.  The driver System Exclusive codes are backwardly
+compatible with previous versions.  In addition a new 
+address is available to Transmit and Receive the entire
+128 note percussion bank.  The ALL dump continues to
+dump the percussion bank as listed below, but you can
+retrieve and set the full percussion bank by using address
+12 Hex.
+
+General MIDI defines 47 drum notes, and the driver has
+storage for 47 drum timbres (128 for version 2.0).  
+The percussion timbres use the percussion voice# parameter 
+to decide which of the 5 drum voices to sound for the drum 
+tone.  In addition a percussion mapping of Key to Timbre is 
+implemented, and may be dumped and loaded.  There are 47 slots 
+in the percussion map, which cover MIDI notes 35 to 81 (in other 
+words, array element 0 corresponds to MIDI note 35).  Each slot 
+is 2 bytes, so the map is 94 byes long:
+
+              Percussion Map Slot
+     Offset   Meaning
+     01       Timbre number to sound (0-46)
+     02       MIDI Note to play for the key
+              (60 = Middle C)
+
+The above map is not required for the Version 2.0 percussion bank,
+as all the parameters are contained within the timbre specification.  
+For compatibility, it will still be dumped and received, however.
+
+System Parameters Exclusive Format
+
+Certain driver configuration parameters may be sent to or
+received from the driver.  Following is the format for the
+system parameter dump and load.  The address to use for
+system parameters is 22 hex for version 2.00 (version 1.x 
+used 20 hex):
+
+Offset  Description            Allowed Values
+
+00    Stereo Mode              0 = Mono, 1 = Stereo
+01    Percussion Mode          0 = Off, 1 = On
+02    Percussion Channel       if Percussion mode = 1:
+                               channel = 0-15 (i.e. MIDI
+                               channel 10 is value 9)
+03    Default Bank             0-4 (Bank1 - Bank5)
+04    Vibrato Depth            0 = light, 1 = deep
+05    Tremolo Depth            0 = light, 1 = deep
+06    Bend Range               0-12 semitones (1 octave)
+07    Save these settings      1 = Save the settings in
+                               the INI file
+08    Channel 0 -- MIDI        0 = Off, 1 = On
+      Channel Map
+:     :                        The channel map specifies
+:     :                        which channels to receive
+                               on and play.
+23    Channel 15               0 = Off, 1 = On
+
+For Version 2.0 a new address is supplied: 22 Hex.  This address
+will transmit and receive all of the above parameters plus the
+new Percussion Boost:
+
+24    Percussion Boost         64 is the mid point (no Boost)
+                               65 - 127 is positive boost, 63 - 0
+                               is negative boost (attenuation).
+
+Examples
+
+The following message will send a timbre to the first bank,
+timbre slot 12 (Vibraphone).  All numbers are in
+hexadecimal:
+
+     F0, 00, 00, 5B, 7F, 01, 12 Header & Send Request
+     00, 0B, 00, 28        	Bank#1,Timbre#12, Size: 40
+     0F, 0B, 0C, 01, 06, 03, 	Data: Operator
+     01, 01, 03, 07          	Parameters
+     0D, 0A, 0C, 02, 07, 02, 
+     01, 03, 02, 00
+     1F, 2A, 0B, 00, 06, 03, 	Data: 2nd Timbre
+     01, 02, 02, 05          	Operator Parameters
+     03, 0D, 0C, 01, 06, 00, 
+     00, 03, 03, 00
+     F7            	        End of Exclusive
+     
+This message requests the driver to send timbre#13, 14, and
+15 from the 2nd Bank:
+
+     F0, 00, 00, 5B,    	Header & Dump
+     7F, 01, 11,          	Request
+     01, 0C, 00, 3C, F7   	Bank#2, Timbre#14, Size: 60
+
+The next message requests the driver to reset all the patch
+banks to the startup state:
+
+     F0, 00, 00, 5B,      Header & Reset
+     7F, 01, 16, F7       Request

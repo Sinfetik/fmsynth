@@ -1,0 +1,25 @@
+FM MIDI Synth driver Version 2.12
+Copyright (c) 1993-1994 by Jamie O'Connell
+ 
+The FM MIDI Synth driver is a replacement driver for sound cards
+that implement FM synthesis.  It features an extensive MIDI 
+implementation as well as support for loadable instrument banks
+and a Control Panel applet for run-time configuration of driver 
+parameters.  It is designed to work with as many different sound 
+cards from various manufacturers as possible. 
+
+Commercial distribution of FM Synth, or inclusion of the driver 
+in a package containing commercial software requires licensing 
+arrangements:
+
+                Jamie O'Connell   CIS: 72662,1433
+                42 Thorndike Street
+                Arlington, MA 02174
+                (617)641-1522 
+
+
+DISCLAIMER
+
+This program is provided without any warranty, expressed or implied,
+including but not limited to fitness for a particular purpose.
+

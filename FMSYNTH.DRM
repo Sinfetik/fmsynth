@@ -1,0 +1,37 @@
+;; DRM Macros for Cakewalk Professional for Windows (any version)
+;; Use Freely...
+;;
+;; FM Synth Version 2.00 - Jamie O'Connell
+
+FM Synth 1 Patch: Bank 1 (input Patch#)=F0 00 00 5B 7F 01 11 00 FE 00 18 F7 
+FM Synth 1 Patch: Bank 2 (input Patch#)=F0 00 00 5B 7F 01 11 01 FE 00 18 F7 
+FM Synth 1 Patch: Bank 3 (input Patch#)=F0 00 00 5B 7F 01 11 02 FE 00 18 F7 
+FM Synth 1 Patch: Bank 4 (input Patch#)=F0 00 00 5B 7F 01 11 03 FE 00 18 F7 
+FM Synth 1 Patch: Bank 5 (input Patch#)=F0 00 00 5B 7F 01 11 04 FE 00 18 F7 
+
+;; Note: for version 2.00 the percussion boost param has been added
+;;       making the dump one byte longer (used to be 18 hex)
+;;       A new address is used (22) to distinguish between the 2
+;; FM Synth SysParm=F0 00 00 5B 7F 01 11 20 00 00 18 F7
+FM Synth SysParm Vers 2.0=F0 00 00 5B 7F 01 11 22 00 00 19 F7
+
+;; *************************************************************************
+;; The following 3 percussion macros are fairly obsolete for version 2.00+ of
+;; FM Synth, though they still work.  Instead us the new "Perc Bank Vers 2.0" 
+;; macro
+;;
+;; FM Synth Perc Bank=F0 00 00 5B 7F 01 11 10 00 08 68 F7 
+;; FM Synth Perc Map=F0 00 00 5B 7F 01 11 11 00 00 5E F7 
+;; FM Synth Perc=F0 00 00 5B 7F 01 11 10 00 0A 44 F7 
+;; *************************************************************************
+FM Synth Perc Bank Vers 2.0=F0 00 00 5B 7F 01 11 12 00 18 00 F7
+
+FM Synth Bank 1=F0 00 00 5B 7F 01 11 00 00 18 00 F7
+FM Synth Bank 2=F0 00 00 5B 7F 01 11 01 00 18 00 F7 
+FM Synth Bank 3=F0 00 00 5B 7F 01 11 02 00 18 00 F7 
+FM Synth Bank 4=F0 00 00 5B 7F 01 11 03 00 18 00 F7 
+FM Synth Bank 5=F0 00 00 5B 7F 01 11 04 00 18 00 F7 
+FM Synth All Banks=F0 00 00 5B 7F 01 11 00 00 78 00 F7
+FM Synth Reset Patches=F0 00 00 5B 7F 01 16 F7 
+FM Synth Reset Driver=F0 00 00 5B 7F 01 15  F7 
+

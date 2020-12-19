@@ -1,0 +1,16 @@
+;-----------------------------------------------------------------------
+; Simple CAL program to Launch the FMSynth Driver from within 
+; Cakewalk -- Requires Version 2.00 of Cakewalk Professional for Windows
+;
+; Created 930916 by Jamie O'Connell
+; Copyright (c) 1993 by Jamie O'Connell
+;
+; This is for version 2.1 of FM Synth or later
+; Use Freely...
+;-----------------------------------------------------------------------
+
+(do
+    (include "NEED20.CAL")	  ; require VERSION >= 20
+    (DLL "Kernel" "WinExec" "FMTASK" 1)
+)
+

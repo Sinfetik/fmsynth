@@ -1,0 +1,13 @@
+
+[disks]
+    1 =. ,"Jamie's FM Driver",disk1
+
+[Installable.Drivers]
+FMSynth = 1:fmsynth.drv,  "MIDI", "Jamie O'Connell - FM Synth MIDI Driver",,,
+
+[FMSynth]
+1:FMTASK.EXE
+1:FMCFG.DLL
+1:FMSYNTH.HLP
+1:ADDMAPFM.REC
+1:ADDMAPFM.EXE
